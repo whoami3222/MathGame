@@ -1,4 +1,6 @@
-﻿string question1 = "What is 5 + 3";
+﻿using System.Diagnostics;
+
+string question1 = "What is 5 + 3";
 string question2 = "What is 10 - 4";
 string question3 = "What is 6 * 7";
 string question4 = "What is 15 / 3";
@@ -47,6 +49,8 @@ void HandleMenuChoice(string? choice)
 
 void StartGame()
 {
+    Stopwatch stopwatch = Stopwatch.StartNew();
+    
     for (int i = 0; i < questions.Length; i++)
     {
         Console.WriteLine(questions[i]);
@@ -56,8 +60,9 @@ void StartGame()
             points++;
         }
     }
-
+    stopwatch.Stop();
     Console.WriteLine($"You scored {points} out of {questions.Length}.");
+    Console.WriteLine($"Time taken: {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
     history.Add($"Game played on {DateTime.Now}: Scored {points}/{questions.Length}");
     PlayAgainPrompt();
 }
@@ -94,7 +99,7 @@ void DisplayList()
     PlayAgainPrompt();
 }
 
-bool CheckAnswer(string question, string answer)
+bool CheckAnswer(string question, string? answer)
 {
     switch (question)
     {
