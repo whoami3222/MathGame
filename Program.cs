@@ -1,11 +1,4 @@
 ﻿using System.Diagnostics;
-
-string question1 = "What is 5 + 3";
-string question2 = "What is 10 - 4";
-string question3 = "What is 6 * 7";
-string question4 = "What is 15 / 3";
-string question5 = "What is 2 ^ 8";
-string[] questions = [question1, question2, question3, question4, question5];
 int points = 0;
 List<string> history = new List<string>();
 MathGame();
@@ -51,19 +44,32 @@ void StartGame()
 {
     Stopwatch stopwatch = Stopwatch.StartNew();
     
-    for (int i = 0; i < questions.Length; i++)
+    for (int i = 0; i < 5; i++)
     {
-        Console.WriteLine(questions[i]);
+        int number1 = new Random().Next(1, 9);
+        int number2 = new Random().Next(1, 9);
+        MathOperation operation = (MathOperation)new Random().Next(0, 4);
+
+        string operationSymbol = operation switch
+        {
+            MathOperation.Addition => "+",
+            MathOperation.Subtraction => "-",
+            MathOperation.Multiplication => "*",
+            MathOperation.Division => "/",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        Console.WriteLine($"Question {i + 1}: What is {number1} {operationSymbol} {number2}?");
         string? input = Console.ReadLine();
-        if (CheckAnswer(questions[i], input))
+        if (CheckAnswer(number1, number2, operation, input))
         {
             points++;
         }
     }
     stopwatch.Stop();
-    Console.WriteLine($"You scored {points} out of {questions.Length}.");
+    Console.WriteLine($"You scored {points} out of 5.");
     Console.WriteLine($"Time taken: {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
-    history.Add($"Game played on {DateTime.Now}: Scored {points}/{questions.Length}");
+    history.Add($"Game played on {DateTime.Now}: Scored {points}/5, Time taken: {stopwatch.Elapsed.TotalSeconds:F2} seconds.");
     PlayAgainPrompt();
 }
 
@@ -73,7 +79,7 @@ void PlayAgainPrompt()
     string? playAgain = Console.ReadLine();
     if (playAgain?.ToLower() == "yes")
     {
-        points = 0; // Reset points for a new game
+        points = 0;
         MathGame();
     }
     else if(playAgain?.ToLower() == "no")
@@ -99,21 +105,29 @@ void DisplayList()
     PlayAgainPrompt();
 }
 
-bool CheckAnswer(string question, string? answer)
+bool CheckAnswer(int number1, int number2, MathOperation operation, string? result)
 {
-    switch (question)
+    int correctAnswer = operation switch
     {
-        case "What is 5 + 3":
-            return answer == "8";
-        case "What is 10 - 4":
-            return answer == "6";
-        case "What is 6 * 7":
-            return answer == "42";
-        case "What is 15 / 3":
-            return answer == "5";
-        case "What is 2 ^ 8":
-            return answer == "256";
-        default:
-            return false;
+        MathOperation.Addition => number1 + number2,
+        MathOperation.Subtraction => number1 - number2,
+        MathOperation.Multiplication => number1 * number2,
+        MathOperation.Division => number1 / number2,
+        _ => throw new ArgumentException("Invalid operation")
+    };
+
+    if (int.TryParse(result, out int parsedValue) && parsedValue == correctAnswer)
+    {
+        return true;
     }
+
+    return false;
+}
+
+public enum MathOperation
+{
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division
 }
